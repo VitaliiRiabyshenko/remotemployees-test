@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
+use App\Http\Requests\CategoryStoreRequest;
+use App\Http\Requests\CategoryUpdateRequest;
 
 class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::all();
+        $categories = Category::paginate(20);
 
         return view('category.index', compact('categories'));
     }
@@ -19,7 +20,7 @@ class CategoryController extends Controller
         return view('category.create');
     }
 
-    public function store(CategoryRequest $request)
+    public function store(CategoryStoreRequest $request)
     {
         $category = ['title' => $request->input('title')];
         Category::create($category);
@@ -27,13 +28,21 @@ class CategoryController extends Controller
         return redirect()->route('category.index')->with('success', "Created new category");
     }
 
-    public function edit(int $id)
+    public function show(string $category_title)
+    {
+        $category = Category::where('title', $category_title)->firstOrFail();
+
+        return view('category.show', compact('category'));
+    }
+
+    public function edit(string $id)
     {
         $category = Category::findOrFail($id);
+
         return view('category.edit', compact('category'));
     }
     
-    public function update(CategoryRequest $request, int $id)
+    public function update(CategoryUpdateRequest $request, string $id)
     {
         $category_data = ['title' => $request->input('title')];
 
@@ -43,9 +52,12 @@ class CategoryController extends Controller
         return redirect()->route('category.index')->with('success', "Updated category $category->title");
     }
 
-    public function destroy(int $id)
+    public function destroy(string $id)
     {
         $category = Category::findOrFail($id);
+
+        // delete category_lot record
+        $category->lots()->detach();
         $category->delete();
 
         return redirect()->route('category.index')->with('success', 'Deleted category');

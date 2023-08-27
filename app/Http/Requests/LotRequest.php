@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class CategoryRequest extends FormRequest
+class LotRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +22,9 @@ class CategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|min:2|max:50|unique:categories,title'
+            'name' => 'required|string|min:3|max:50',
+            'description' => 'required|string|min:3|max:512',
+            'categories' => 'required|array|min:1|exists:categories,id'
         ];
     }
 }
