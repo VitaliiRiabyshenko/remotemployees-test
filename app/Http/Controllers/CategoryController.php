@@ -22,8 +22,7 @@ class CategoryController extends Controller
 
     public function store(CategoryStoreRequest $request)
     {
-        $category = ['title' => $request->input('title')];
-        Category::create($category);
+        Category::create($request->validated());
         
         return redirect()->route('category.index')->with('success', "Created new category");
     }
@@ -44,10 +43,8 @@ class CategoryController extends Controller
     
     public function update(CategoryUpdateRequest $request, string $id)
     {
-        $category_data = ['title' => $request->input('title')];
-
         $category = Category::findOrFail($id);
-        $category->update($category_data);
+        $category->update($request->validated());
         
         return redirect()->route('category.index')->with('success', "Updated category $category->title");
     }

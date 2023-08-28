@@ -31,12 +31,7 @@ class LotController extends Controller
 
     public function store(LotRequest $request)
     {
-        $lot_data = [
-            'name' => $request->input('name'),
-            'description' => $request->input('description')
-        ];
-
-        $lot = Lot::create($lot_data);
+        $lot = Lot::create($request->safe()->only(['name', 'description']));
         $lot->categories()->attach($request->input('categories'));
 
         return redirect()->route('lot.index')->with('success', "Lot $lot->name created successful");
@@ -64,13 +59,8 @@ class LotController extends Controller
 
     public function update(LotRequest $request, string $id)
     {
-        $lot_data = [
-            'name' => $request->input('name'),
-            'description' => $request->input('description')
-        ];
-
         $lot = Lot::findOrFail($id);
-        $lot->update($lot_data);
+        $lot->update($request->safe()->only(['name', 'description']));
         $lot->categories()->sync($request->categories);
 
         return redirect()->route('lot.index')->with('success', "Lot $lot->name updated successful");
